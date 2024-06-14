@@ -6,7 +6,7 @@ import os
 import itertools
 import argparse
 import numpy as np
-from typing import List, Tuple, Set
+from typing import List, Tuple, Set, Dict
 from matplotlib import pyplot as plt
 
 def load_structure(path: str):
@@ -57,7 +57,8 @@ def contact_map(model,
 def generate_contact_maps(structure,
                           include: None | List[Set[str]] = None,
                           threshold=5.0,
-                          folder="."):
+                          folder=".",
+                          names = Dict|None):
     os.makedirs(folder, exist_ok=True)
     print(f"Analysing distance maps at {threshold} Å")
     model = structure[0]
@@ -73,20 +74,21 @@ def generate_contact_maps(structure,
         a, b = pair
         filename = f"contacts-{structure.id}-{a}-{b}-{threshold}.png"
         analyse_contacts(pair, structure, threshold,
-                         f'{folder}/{filename}')
+                         f'{folder}/{filename}',
+                         names)
     for pair in zip(chains, chains):
         if include:
-            pair = set(pair)
-            if pair not in include:
+            unique_pair = set(pair)
+            if unique_pair not in include:
                 continue
-        print(pair)
         if pair[0] == pair[1]:
             a, b = pair
             filename = f"contacts-{structure.id}-{a}-{b}-{threshold}.png"
             analyse_contacts((pair[0], pair[0]), structure, threshold,
-                             f'{folder}/{filename}')
+                             f'{folder}/{filename}',
+                             names)
 
-def analyse_contacts(pair, structure, threshold, filename):
+def analyse_contacts(pair, structure, threshold, filename, names):
     a, b = sorted(list(pair))
     c = contact_map(structure[0],
                     a,
@@ -95,6 +97,9 @@ def analyse_contacts(pair, structure, threshold, filename):
     # save only if sum is bigger than 1
     if c.sum() != 0:
         print(f"making contacts for {pair}\n {c.sum()} contacts in total")
+        if names:
+            a = names[a]
+            b = names[b]
         make_contact_plot(c,
                           xname = a,
                           yname = b,
@@ -112,7 +117,21 @@ def make_contact_plot(contacts, xname, yname, name):
 
 def parse_filter(x: str):
     if x:
-        return [set(item) for item in x.split(':')]
+        out = [set(item) for item in x.split(':')]
+        for item in out:
+            if len(item) >= 2:
+                raise RuntimeError(f"You must give a pair of two symbols! Example 'ab' for chain a vs b.")
+        return out
+
+def parse_new_names(names: None|str):
+    out = None
+    if names:
+        pairs = names.split(',')
+        out = dict()
+        for pair in pairs:
+            key, value = pair.split(':')
+            out[key] = value
+    return out
 
 def main():
     radius = 15
@@ -129,16 +148,21 @@ def main():
                         help="The chains to calculate specifically.\nGive each"
                         "pair as two symbols separated by :. For example"
                         "AB:CC")
+    parser.add_argument('-n', "--names",
+                        default=None,
+                        help="A string of ''<id>:name' pairs separated by comma's.")
     parser.add_argument('-r', '--radius',
                         help="The radius for which two CA atoms are concidered in contact.")
     args = parser.parse_args()
     include = parse_filter(args.filter)
+    new_names = parse_new_names(args.names)
     pdb_filename = args.structure
     structure = load_structure(pdb_filename)
     generate_contact_maps(structure,
                           include=include,
                           threshold=radius,
-                          folder=args.output)
+                          folder=args.output,
+                          names=new_names)
 
 if __name__ == "__main__":
     main()
