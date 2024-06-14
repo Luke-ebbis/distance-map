@@ -118,8 +118,10 @@ def make_contact_plot(contacts, xname, yname, name):
 def parse_filter(x: str):
     if x:
         out = [set(item) for item in x.split(':')]
+        print(f"filter: {out}")
         for item in out:
-            if len(item) >= 2:
+            print(len(item))
+            if not len(item) <= 2:
                 raise RuntimeError(f"You must give a pair of two symbols! Example 'ab' for chain a vs b.")
         return out
 
