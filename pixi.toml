@@ -1,0 +1,14 @@
+[project]
+name = "contact-map"
+version = "0.1.0"
+description = "Add a short description here"
+authors = ["Sibbe Bakker <sibbe.bakker@wur.nl>"]
+channels = ["conda-forge"]
+platforms = ["linux-64"]
+
+[tasks]
+
+[dependencies]
+biopython = ">=1.83,<2"
+numpy = ">=1.26.4,<1.27"
+matplotlib = ">=3.8.4,<3.9"
