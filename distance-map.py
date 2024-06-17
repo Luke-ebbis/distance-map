@@ -2,15 +2,19 @@
 # -*- coding: utf-8 -*-
 # Code adapted from
 import Bio.PDB
+import math
 import os
+import networkx as nx
+from itertools import chain
 import itertools
 import argparse
 import numpy as np
+import pandas as pd
 from typing import List, Tuple, Set, Dict
 from matplotlib import pyplot as plt
 
 def load_structure(path: str):
-    name = path
+    name = os.path.basename(path)
     if path.endswith("pdb"):
         structure = (Bio.PDB.PDBParser().get_structure(name, path))
     if path.endswith("cif"):
@@ -71,22 +75,24 @@ def generate_contact_maps(structure,
             pair = set(pair)
             if pair not in include:
                 continue
+        pair = tuple(pair)
         a, b = pair
         filename = f"contacts-{structure.id}-{a}-{b}-{threshold}.png"
-        analyse_contacts(pair, structure, threshold,
-                         f'{folder}/{filename}',
-                         names)
+        maps[pair] = analyse_contacts(pair, structure, threshold,
+                                      f'{folder}/{filename}', names)
     for pair in zip(chains, chains):
         if include:
             unique_pair = set(pair)
             if unique_pair not in include:
                 continue
         if pair[0] == pair[1]:
+            pair = tuple(pair)
             a, b = pair
             filename = f"contacts-{structure.id}-{a}-{b}-{threshold}.png"
-            analyse_contacts((pair[0], pair[0]), structure, threshold,
-                             f'{folder}/{filename}',
-                             names)
+            maps[pair] = analyse_contacts((pair[0], pair[0]), structure,
+                                          threshold, f'{folder}/{filename}',
+                                          names)
+    return maps
 
 def analyse_contacts(pair, structure, threshold, filename, names):
     a, b = sorted(list(pair))
@@ -104,6 +110,7 @@ def analyse_contacts(pair, structure, threshold, filename, names):
                           xname = a,
                           yname = b,
                           name=filename)
+    return c.sum()
 
 def make_contact_plot(contacts, xname, yname, name):
      fig = plt.figure()
@@ -135,6 +142,65 @@ def parse_new_names(names: None|str):
             out[key] = value
     return out
 
+def switch_names(x, names):
+    name = x
+    if names:
+        name = names[x]
+    return name
+        
+
+def make_contact_edgelist(maps: Dict, names):
+    print(maps)
+    subunits = set(chain(*[su for su in maps.keys()]))
+    print(f"Found subunits {subunits}")
+    records = {"sourceNode" : [],
+               "targetNode" : [],
+               "weight" : []}
+    for value in maps:
+        one, two = value
+        one =  switch_names(one, names)
+        two =  switch_names(two, names)
+        weight = maps[value]
+        if weight != 0:
+            records["sourceNode"].append(one)
+            records["targetNode"].append(two)
+            records["weight"].append(weight)
+    return pd.DataFrame.from_dict(records)
+
+def plot_network(edge_list, filename):
+    """Plotting networks.
+
+    """
+    edge_list['weight_frac'] = (np.log(edge_list['weight']))
+    print(edge_list)
+    G = nx.from_pandas_edgelist(edge_list, source='sourceNode',
+                                target='targetNode',
+                                edge_attr='weight_frac')
+
+    widths = nx.get_edge_attributes(G, 'weight_frac')
+    print(widths)
+    nodelist = G.nodes()
+
+    plt.figure(figsize=(12,8))
+
+    pos = nx.shell_layout(G)
+    nx.draw_networkx_nodes(G,pos,
+                           nodelist=nodelist,
+                           node_size=1500,
+                           node_color='grey',
+                           alpha=0.7)
+    nx.draw_networkx_edges(G,pos,
+                           edgelist = widths.keys(),
+                           width=list(widths.values()),
+                           edge_color='lightblue',
+                           #  alpha=0.6
+                           )
+    nx.draw_networkx_labels(G, pos=pos,
+                            labels=dict(zip(nodelist,nodelist)),
+                            font_color='black')
+    plt.savefig(filename, dpi=300, bbox_inches='tight')
+    plt.close()
+
 def main():
     radius = 15
     parser = argparse.ArgumentParser(
@@ -160,11 +226,10 @@ def main():
     new_names = parse_new_names(args.names)
     pdb_filename = args.structure
     structure = load_structure(pdb_filename)
-    generate_contact_maps(structure,
-                          include=include,
-                          threshold=radius,
-                          folder=args.output,
-                          names=new_names)
+    maps = generate_contact_maps(structure, include=include, threshold=radius,
+                                 folder=args.output, names=new_names)
+    edge_list = make_contact_edgelist(maps, new_names)
+    plot_network(edge_list, filename=f"{args.output}/graph.png")
 
 if __name__ == "__main__":
     main()

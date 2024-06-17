@@ -1,4 +1,4 @@
-version: 4
+version: 5
 environments:
   default:
     channels:
@@ -103,12 +103,14 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/linux-64/mysql-common-8.3.0-hf1915f5_4.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/mysql-libs-8.3.0-hca2cd23_4.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/ncurses-6.5-h59595ed_0.conda
+      - conda: https://conda.anaconda.org/conda-forge/noarch/networkx-3.3-pyhd8ed1ab_1.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/nspr-4.35-h27087fc_0.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/nss-3.100-hca3bf56_0.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/numpy-1.26.4-py312heda63a1_0.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/openjpeg-2.5.2-h488ebb8_0.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/openssl-3.3.1-h4ab18f5_0.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/packaging-24.1-pyhd8ed1ab_0.conda
+      - conda: https://conda.anaconda.org/conda-forge/linux-64/pandas-2.2.2-py312h1d6d2e6_1.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/pcre2-10.43-hcad00b1_0.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/pillow-10.3.0-py312hdcec9eb_0.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/pixman-0.43.2-h59595ed_0.conda
@@ -120,9 +122,12 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/linux-64/pyqt5-sip-12.12.2-py312h30efb56_5.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/python-3.12.3-hab00c5b_0_cpython.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/python-dateutil-2.9.0-pyhd8ed1ab_0.conda
+      - conda: https://conda.anaconda.org/conda-forge/noarch/python-tzdata-2024.1-pyhd8ed1ab_0.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/python_abi-3.12-4_cp312.conda
+      - conda: https://conda.anaconda.org/conda-forge/noarch/pytz-2024.1-pyhd8ed1ab_0.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/qt-main-5.15.8-hc9dc06e_21.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/readline-8.2-h8228510_1.conda
+      - conda: https://conda.anaconda.org/conda-forge/linux-64/scipy-1.13.1-py312hc2bc53b_0.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/sip-6.7.12-py312h30efb56_0.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/six-1.16.0-pyh6c4a22f_0.tar.bz2
       - conda: https://conda.anaconda.org/conda-forge/linux-64/tk-8.6.13-noxft_h4845f30_101.conda
@@ -1785,6 +1790,27 @@ packages:
   size: 887465
   timestamp: 1715194722503
 - kind: conda
+  name: networkx
+  version: '3.3'
+  build: pyhd8ed1ab_1
+  build_number: 1
+  subdir: noarch
+  noarch: python
+  url: https://conda.anaconda.org/conda-forge/noarch/networkx-3.3-pyhd8ed1ab_1.conda
+  sha256: cbd8a6de87ad842e7665df38dcec719873fe74698bc761de5431047b8fada41a
+  md5: d335fd5704b46f4efb89a6774e81aef0
+  depends:
+  - python >=3.10
+  constrains:
+  - pandas >=1.4
+  - numpy >=1.22
+  - matplotlib >=3.5
+  - scipy >=1.9,!=1.11.0,!=1.11.1
+  license: BSD-3-Clause
+  license_family: BSD
+  size: 1185670
+  timestamp: 1712540499262
+- kind: conda
   name: nspr
   version: '4.35'
   build: h27087fc_0
@@ -1890,6 +1916,28 @@ packages:
   license_family: APACHE
   size: 50290
   timestamp: 1718189540074
+- kind: conda
+  name: pandas
+  version: 2.2.2
+  build: py312h1d6d2e6_1
+  build_number: 1
+  subdir: linux-64
+  url: https://conda.anaconda.org/conda-forge/linux-64/pandas-2.2.2-py312h1d6d2e6_1.conda
+  sha256: 80fd53b68aa89b929d03874b99621ec8cc6a12629bd8bfbdca87a95f8852af96
+  md5: ae00b61f3000d2284d1f2584d4dfafa8
+  depends:
+  - libgcc-ng >=12
+  - libstdcxx-ng >=12
+  - numpy >=1.19,<3
+  - python >=3.12,<3.13.0a0
+  - python-dateutil >=2.8.1
+  - python-tzdata >=2022a
+  - python_abi 3.12.* *_cp312
+  - pytz >=2020.1
+  license: BSD-3-Clause
+  license_family: BSD
+  size: 15458981
+  timestamp: 1715898284697
 - kind: conda
   name: pcre2
   version: '10.43'
@@ -2100,6 +2148,21 @@ packages:
   size: 222742
   timestamp: 1709299922152
 - kind: conda
+  name: python-tzdata
+  version: '2024.1'
+  build: pyhd8ed1ab_0
+  subdir: noarch
+  noarch: python
+  url: https://conda.anaconda.org/conda-forge/noarch/python-tzdata-2024.1-pyhd8ed1ab_0.conda
+  sha256: 9da9a849d53705dee450b83507df1ca8ffea5f83bd21a215202221f1c492f8ad
+  md5: 98206ea9954216ee7540f0c773f2104d
+  depends:
+  - python >=3.6
+  license: Apache-2.0
+  license_family: APACHE
+  size: 144024
+  timestamp: 1707747742930
+- kind: conda
   name: python_abi
   version: '3.12'
   build: 4_cp312
@@ -2114,6 +2177,21 @@ packages:
   license_family: BSD
   size: 6385
   timestamp: 1695147396604
+- kind: conda
+  name: pytz
+  version: '2024.1'
+  build: pyhd8ed1ab_0
+  subdir: noarch
+  noarch: python
+  url: https://conda.anaconda.org/conda-forge/noarch/pytz-2024.1-pyhd8ed1ab_0.conda
+  sha256: 1a7d6b233f7e6e3bbcbad054c8fd51e690a67b129a899a056a5e45dd9f00cb41
+  md5: 3eeeeb9e4827ace8c0c1419c85d590ad
+  depends:
+  - python >=3.7
+  license: MIT
+  license_family: MIT
+  size: 188538
+  timestamp: 1706886944988
 - kind: conda
   name: qt-main
   version: 5.15.8
@@ -2190,6 +2268,30 @@ packages:
   license_family: GPL
   size: 281456
   timestamp: 1679532220005
+- kind: conda
+  name: scipy
+  version: 1.13.1
+  build: py312hc2bc53b_0
+  subdir: linux-64
+  url: https://conda.anaconda.org/conda-forge/linux-64/scipy-1.13.1-py312hc2bc53b_0.conda
+  sha256: 865fe2b3ed1aee0a42f6f275592f2571e68f2a60235c86bd9ababc681e30fbb5
+  md5: 864b2399a9c998e17d1a9a4e0c601285
+  depends:
+  - libblas >=3.9.0,<4.0a0
+  - libcblas >=3.9.0,<4.0a0
+  - libgcc-ng >=12
+  - libgfortran-ng
+  - libgfortran5 >=12.3.0
+  - liblapack >=3.9.0,<4.0a0
+  - libstdcxx-ng >=12
+  - numpy <2.3
+  - numpy >=1.19,<3
+  - python >=3.12,<3.13.0a0
+  - python_abi 3.12.* *_cp312
+  license: BSD-3-Clause
+  license_family: BSD
+  size: 17344054
+  timestamp: 1716471229479
 - kind: conda
   name: sip
   version: 6.7.12
